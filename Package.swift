@@ -3,9 +3,9 @@
 //
 //     .package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.2.0")
 //
-// 这是 kadaliao/openhongguo 的临时发布：v0.2.0 加上播放签名修复
-// （beilunyang/openhongguo#7），xcframework 从这个 fork 的 Release 下载。
-// 上游合并并发布新版本后，改回上游。
+// 这是 kadaliao/openhongguo 的临时发布：上游 main（2769fb6，准备中的 0.3.0，
+// 含播放签名修复和弹幕），xcframework 从这个 fork 的 Release 下载。
+// 上游发布 0.3.0 后，改回上游。
 //
 // Go 编译出的 OpenhongguoCore.xcframework 从 GitHub Release 下载。本地开发和
 // 测试用 bindings/mobile/ios/Package.swift，它引用 build.sh 生成的 xcframework。
@@ -20,8 +20,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "OpenhongguoCore",
-            url: "https://github.com/kadaliao/openhongguo/releases/download/v0.2.1-kx.1/OpenhongguoCore.xcframework.zip",
-            checksum: "1f2d82a837b97539a9f4904d6ab0049d320ba99db0c4f783b039d9f489c55cbc"
+            url: "https://github.com/kadaliao/openhongguo/releases/download/v0.3.0-kx.1/OpenhongguoCore.xcframework.zip",
+            checksum: "b15787e324c875543deae925b1c0c6d77226edde35effe96413cd18eb5af4b8d"
         ),
         .target(
             name: "Openhongguo",
