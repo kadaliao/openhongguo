@@ -1,7 +1,7 @@
 // swift-tools-version:5.9
 // openhongguo 的 Swift 包，供 App 通过 Swift Package Manager 引用：
 //
-//     .package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.2.0")
+//     .package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.3.0")
 //
 // 这是 kadaliao/openhongguo 的临时发布：上游 main（2769fb6，准备中的 0.3.0，
 // 含播放签名修复和弹幕），xcframework 从这个 fork 的 Release 下载。

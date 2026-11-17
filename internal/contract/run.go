@@ -327,6 +327,7 @@ func playSeries(ctx context.Context, client *sdk.Client, rec *recorder, cfg Conf
 	}
 
 	rec.forget(protocol.PathPlayback)
+	rec.forget(protocol.PathPlaybackV5)
 	pb, err := client.ResolvePlayback(ctx, page.Items[0].ID, sdk.PlaybackOptions{})
 	if errors.Is(err, sdk.ErrDRMProtected) && pb != nil {
 		err = nil
@@ -340,7 +341,11 @@ func playSeries(ctx context.Context, client *sdk.Client, rec *recorder, cfg Conf
 			playbackFixture = "drm-playback.json"
 		}
 	}
-	checks = append(checks, rec.check(cfg, name+" playback", playbackFixture, protocol.PathPlayback, err))
+	playbackPath := protocol.PathPlaybackV5
+	if !rec.has(protocol.PathPlaybackV5) {
+		playbackPath = protocol.PathPlayback
+	}
+	checks = append(checks, rec.check(cfg, name+" playback", playbackFixture, playbackPath, err))
 	if err != nil || !pb.Protected {
 		return checks
 	}

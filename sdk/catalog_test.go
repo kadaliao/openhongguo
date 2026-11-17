@@ -70,11 +70,12 @@ func testClient(t *testing.T, handler http.Handler) (*sdk.Client, *logCapture) {
 func happyHandler(t *testing.T, seen *[]captured) http.Handler {
 	t.Helper()
 	files := map[string]string{
-		protocol.PathDiscover: "discover-response.json",
-		protocol.PathSearch:   "search-response.json",
-		protocol.PathSeries:   "series-response.json",
-		protocol.PathPlayback: "drm-playback.json",
-		protocol.PathRegister: "register-response.json",
+		protocol.PathDiscover:   "discover-response.json",
+		protocol.PathSearch:     "search-response.json",
+		protocol.PathSeries:     "series-response.json",
+		protocol.PathPlaybackV5: "drm-playback.json",
+		protocol.PathPlayback:   "drm-playback.json",
+		protocol.PathRegister:   "register-response.json",
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)
@@ -445,6 +446,11 @@ func assertAnonymousWire(t *testing.T, seen []captured) {
 			}
 			if hit.Header.Get("x-gorgon") == "" || hit.Header.Get("x-ss-stub") == "" {
 				t.Fatal("series signature missing")
+			}
+		case protocol.PathPlaybackV5:
+			played = true
+			if hit.Header.Get("x-ss-stub") == "" {
+				t.Fatal("playback v5 stub missing")
 			}
 		case protocol.PathPlayback:
 			played = true
