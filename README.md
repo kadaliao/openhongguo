@@ -5,11 +5,13 @@
 [![npm react-native](https://img.shields.io/npm/v/react-native-openhongguo?label=npm%20react-native)](https://www.npmjs.com/package/react-native-openhongguo)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.beilunyang/openhongguo)](https://central.sonatype.com/artifact/io.github.beilunyang/openhongguo)
 [![pub.dev](https://img.shields.io/pub/v/openhongguo)](https://pub.dev/packages/openhongguo)
+[![Docker](https://img.shields.io/docker/v/beilunyang/openhongguo-signer?sort=semver&label=docker%20signer)](https://hub.docker.com/r/beilunyang/openhongguo-signer)
 [![CI](https://github.com/beilunyang/openhongguo/actions/workflows/ci.yml/badge.svg)](https://github.com/beilunyang/openhongguo/actions/workflows/ci.yml)
 
 [![npm downloads](https://img.shields.io/npm/d18m/openhongguo?label=npm%20downloads)](https://www.npmjs.com/package/openhongguo)
 [![react-native downloads](https://img.shields.io/npm/d18m/react-native-openhongguo?label=react-native%20downloads)](https://www.npmjs.com/package/react-native-openhongguo)
 [![pub downloads](https://img.shields.io/pub/dm/openhongguo?label=pub%20downloads)](https://pub.dev/packages/openhongguo)
+[![Docker pulls](https://img.shields.io/docker/pulls/beilunyang/openhongguo-signer?label=docker%20pulls)](https://hub.docker.com/r/beilunyang/openhongguo-signer)
 [![CLI downloads](https://img.shields.io/github/downloads/beilunyang/openhongguo/total?label=CLI%20downloads)](https://github.com/beilunyang/openhongguo/releases)
 
 openhongguo 是红果短剧（Hongguo）的非官方 SDK，提供 Go、Node.js、Android、iOS、React Native 和 Flutter 版本。SDK 可以浏览短剧目录、搜索短剧、读取短剧和分集的详情与弹幕，并取得分集的播放地址和内容密钥。
@@ -44,8 +46,8 @@ SDK 用匿名设备发送所有请求，不需要登录。Go 以外的 SDK 都�
 |---|---|---|---|
 | Go | [`github.com/beilunyang/openhongguo`](https://pkg.go.dev/github.com/beilunyang/openhongguo/sdk) | `go get github.com/beilunyang/openhongguo@latest` | 本文 |
 | Node.js | [`openhongguo`](https://www.npmjs.com/package/openhongguo) | `npm install openhongguo` | [bindings/node](bindings/node/README.md) |
-| Android（Kotlin） | [`io.github.beilunyang:openhongguo`](https://central.sonatype.com/artifact/io.github.beilunyang/openhongguo) | `implementation("io.github.beilunyang:openhongguo:0.3.0")` | [bindings/mobile](bindings/mobile/README.md) |
-| iOS / macOS（Swift） | Swift Package | `.package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.3.0")` | [bindings/mobile](bindings/mobile/README.md) |
+| Android（Kotlin） | [`io.github.beilunyang:openhongguo`](https://central.sonatype.com/artifact/io.github.beilunyang/openhongguo) | `implementation("io.github.beilunyang:openhongguo:0.4.1")` | [bindings/mobile](bindings/mobile/README.md) |
+| iOS / macOS（Swift） | Swift Package | `.package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.4.1")` | [bindings/mobile](bindings/mobile/README.md) |
 | React Native | [`react-native-openhongguo`](https://www.npmjs.com/package/react-native-openhongguo) | `npx expo install react-native-openhongguo` | [bindings/react-native](bindings/react-native/README.md) |
 | Flutter | [`openhongguo`](https://pub.dev/packages/openhongguo) | `flutter pub add openhongguo` | [bindings/flutter](bindings/flutter/README.md) |
 
@@ -133,6 +135,7 @@ client, err := adapters.NewClient("anonymous.json", sdk.Options{
 | `DeviceResets` | 设备被拒或播放返回空结果时，一次调用最多更换几台匿名设备。`sdk.Int(0)` 表示关闭，见[自动更换设备](#自动更换设备) | 2 |
 | `Logger` | 接收诊断日志 | 不记录 |
 | `APIOrigin`、`RegisterOrigin`、`DistributionOrigin` | 接口地址 | 与 App 相同 |
+| `SignerURL`、`SignerToken` | 签名服务的地址和 token，见[选择签名方式](#选择签名方式) | 空，用内置的 Go 实现签名 |
 
 如果不用 `adapters`，直接调用 `sdk.NewClient`。这时 `Transport` 和 `ProfileStore` 是必填的。
 
@@ -183,7 +186,7 @@ case err != nil:
 |---|---|---|---|
 | `ErrInvalidOptions` | `INVALID_OPTIONS` | 客户端的设置或调用参数无效 | 否 |
 | `ErrProfileNotFound` | `PROFILE_NOT_FOUND` | 还没有保存过设备档案 | 否 |
-| `ErrSignerUnavailable` | `SIGNER_UNAVAILABLE` | 请求需要签名，而客户端没有可用的签名器 | 否 |
+| `ErrSignerUnavailable` | `SIGNER_UNAVAILABLE` | 请求需要签名，而客户端没有可用的签名器，或者签名服务不可用 | 否 |
 | `ErrAuthenticationRequired` | `AUTHENTICATION_REQUIRED` | 内容需要登录才能访问，匿名客户端无法继续 | 否 |
 | `ErrNotProtected` | `NOT_PROTECTED` | 为未加密的播放模型请求了内容密钥 | 否 |
 | `ErrDRMProtected` | `DRM_PROTECTED` | 分集是加密的，需要内容密钥才能解密 | 否 |
@@ -286,6 +289,57 @@ type Transport interface {
 
 `httptransport.New()` 是默认实现。`SetLogger` 把每个请求的方法、脱敏后的 URL 和状态码写入日志。
 
+### 选择签名方式
+
+需要签名的请求有两种签名方式：
+
+| 方式 | 怎样开启 | 适用场景 |
+|---|---|---|
+| 内置签名（默认） | 不设 `SignerURL` | 平时使用。纯 Go 实现，输出与 App 自带的签名库（v04.10.03）一致，不依赖外部服务 |
+| 签名服务 | 设置 `SignerURL` | 内置签名失效时（例如 App 升级后签名算法变化）。需要先部署 [openhongguo-signer](signer/README.md)，镜像是 Docker Hub 上的 [`beilunyang/openhongguo-signer`](https://hub.docker.com/r/beilunyang/openhongguo-signer) |
+
+```go
+// 内置签名
+client, err := adapters.NewClient("anonymous.json", sdk.Options{})
+
+// 签名服务
+client, err := adapters.NewClient("anonymous.json", sdk.Options{
+	SignerURL:   "https://signer.example.com",
+	SignerToken: token, // 服务端没有设置 SIGNER_TOKEN 时省略
+})
+```
+
+各语言的写法：
+
+| 语言 | 内置签名 | 签名服务 |
+|---|---|---|
+| Go | 不设 `SignerURL` | `sdk.Options{SignerURL: "...", SignerToken: "..."}` |
+| Node.js、React Native | 不传 `signerUrl` | `createClient({ signerUrl: '...', signerToken: '...' })` |
+| Flutter、Swift、Kotlin | 不传 `signerUrl` | `ClientOptions(signerUrl: ..., signerToken: ...)` |
+| 命令行 `ohg` | 不设 `OHG_SIGNER_URL` | `OHG_SIGNER_URL=... OHG_SIGNER_TOKEN=... ohg ...`，见[命令行文档](docs/cli.md#配置) |
+
+> **注意**：
+>
+> - 签名方式在创建客户端时确定，之后不能切换。
+> - 只设 `SignerToken`、不设 `SignerURL` 时，仍然使用内置签名。
+> - x-medusa 里有一个字段，签名库按请求的哈希从 16 种算法里挑一种来算。内置签名目前实现了其中 2 种，签名时会把 `_rticket` 往后调几毫秒，直到请求选中已实现的那种，所以 `_rticket` 可能比当前时间晚几毫秒。
+
+使用签名服务时，需要签名的请求发出前，SDK 把 URL 和请求体发给签名服务，用返回的签名头替换内置签名算出的签名头。发给签名服务的请求同样经过 `Transport`。
+
+签名服务不可用时，调用返回 `sdk.ErrSignerUnavailable`（其他语言是错误码 `SIGNER_UNAVAILABLE`），错误信息带有签名服务给出的原因。这时请求不会发出，也不会自动回退到内置签名。因为内置签名失效时，回退得到的往往是空结果，SDK 还会因此换设备重试。
+
+需要回退时，调用方自己再创建一个使用内置签名的客户端，重新调用一次。两个客户端使用不同的设备档案，免得一个换设备时覆盖另一个的档案：
+
+```go
+remote, _ := adapters.NewClient("anonymous-remote.json", sdk.Options{SignerURL: signerURL})
+local, _ := adapters.NewClient("anonymous-local.json", sdk.Options{})
+
+page, err := remote.Search(ctx, "短剧", sdk.SearchOptions{})
+if errors.Is(err, sdk.ErrSignerUnavailable) {
+	page, err = local.Search(ctx, "短剧", sdk.SearchOptions{})
+}
+```
+
 ## 接口
 
 各语言的方法一一对应，参数的顺序相同。Go 的方法名以大写字母开头，其他语言以小写字母开头。返回值的字段见[类型参考](docs/types.md)。
@@ -336,7 +390,7 @@ type Transport interface {
 | Go | 其他语言 | 作用 |
 |---|---|---|
 | `Person` | `person(userId)` | 加载一位演员或一个角色的主页 |
-| `PersonWorks` | `personWorks(userId, cursor)` | 加载一位演员参演的短剧，一次一页（主页上的作品 › 剧作） |
+| `PersonWorks` | `personWorks(userId, cursor)` | 加载一位演员参演的短剧，一次一页（主页上的剧作） |
 
 ### 播放与设备
 

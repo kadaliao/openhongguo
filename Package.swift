@@ -1,15 +1,12 @@
 // swift-tools-version:5.9
 // openhongguo 的 Swift 包，供 App 通过 Swift Package Manager 引用：
 //
-//     .package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.3.0")
+//     .package(url: "https://github.com/beilunyang/openhongguo.git", from: "0.4.1")
 //
-// 这是 kadaliao/openhongguo 的临时发布：上游 v0.3.0 加上 V5 播放取址修复
-// （beilunyang/openhongguo#13），xcframework 从这个 fork 的 Release 下载。
-// 上游发布这个修复后，改回上游。
-//
-// 从 v0.3.1-kx.2 起 xcframework 多了 tvOS 和 tvOS 模拟器两个部分，供开心果的
-// Apple TV 版用，由 bindings/mobile/add-tvos.sh 加上；其余部分和 v0.3.1-kx.1
-// 逐字节相同。
+// 这是 kadaliao/openhongguo 的临时发布 v0.4.1-kx.1：Go 代码和上游 v0.4.1 相同，
+// xcframework 多了 tvOS 和 tvOS 模拟器两个部分，供开心果的 Apple TV 版用，由
+// bindings/mobile/add-tvos.sh 加上；iOS、iOS 模拟器和 macOS 三个部分和上游
+// v0.4.1 的逐字节相同。上游的 xcframework 带上 tvOS 后，改回上游。
 //
 // Go 编译出的 OpenhongguoCore.xcframework 从 GitHub Release 下载。本地开发和
 // 测试用 bindings/mobile/ios/Package.swift，它引用 build.sh 生成的 xcframework。
@@ -24,8 +21,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "OpenhongguoCore",
-            url: "https://github.com/kadaliao/openhongguo/releases/download/v0.3.1-kx.2/OpenhongguoCore.xcframework.zip",
-            checksum: "21391e5d7f48e7fbe8d21df5a10de3ad6dbfc16ad13b3374442c4ec3acc91b69"
+            url: "https://github.com/kadaliao/openhongguo/releases/download/v0.4.1-kx.1/OpenhongguoCore.xcframework.zip",
+            checksum: "8098fb63952987d15d943bfebcfa1799787406342ee831fc62326611bfa9e78f"
         ),
         .target(
             name: "Openhongguo",
