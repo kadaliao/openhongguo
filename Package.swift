@@ -8,6 +8,9 @@
 // bindings/mobile/add-tvos.sh 加上；iOS、iOS 模拟器和 macOS 三个部分和上游
 // v0.4.1 的逐字节相同。上游的 xcframework 带上 tvOS 后，改回上游。
 //
+// v0.4.1-kx.2 在 kx.1 上加了 beilunyang/openhongguo#16（播放接口返回空时改走
+// video_tab），只给 Go 用；这里的 xcframework 仍是 kx.1 的，不含这个修复。
+//
 // Go 编译出的 OpenhongguoCore.xcframework 从 GitHub Release 下载。本地开发和
 // 测试用 bindings/mobile/ios/Package.swift，它引用 build.sh 生成的 xcframework。
 import PackageDescription
