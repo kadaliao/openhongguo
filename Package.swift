@@ -12,6 +12,9 @@
 // video_tab），xcframework 由这个 fork 自己编译（iOS、macOS 用官方 gomobile，
 // tvOS 用 add-tvos.sh）。同一个 Release 里还有开心果 Android 用的 aar。
 //
+// v0.4.1-kx.4 再加上 beilunyang/openhongguo#25（旧版播放接口保留 x-medusa），
+// 编法和 kx.3 相同。
+//
 // Go 编译出的 OpenhongguoCore.xcframework 从 GitHub Release 下载。本地开发和
 // 测试用 bindings/mobile/ios/Package.swift，它引用 build.sh 生成的 xcframework。
 import PackageDescription
@@ -25,8 +28,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "OpenhongguoCore",
-            url: "https://github.com/kadaliao/openhongguo/releases/download/v0.4.1-kx.3/OpenhongguoCore.xcframework.zip",
-            checksum: "0449c9be17c7605efcc8334eb7428b171eece7d84947b97c3bfb1648c976c83b"
+            url: "https://github.com/kadaliao/openhongguo/releases/download/v0.4.1-kx.4/OpenhongguoCore.xcframework.zip",
+            checksum: "ce980d273881ee4d91c5e3773da6545d746919b646c4f22f5c03fc713f457649"
         ),
         .target(
             name: "Openhongguo",
